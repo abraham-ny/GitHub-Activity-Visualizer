@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub User Activity</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+</head>
+
+<body>
+    <h1>GitHub User Activity</h1>
+    <label for="username">GitHub Username: </label>
+    <input type="text" id="username" placeholder="Enter GitHub username" />
+    <button onclick="fetchGitHubData()">Fetch Data</button>
+
+    <div id="repo-info"></div>
+
+    <div>
+        <h3>Commit Activity (Commits per Day)</h3>
+        <canvas id="commitsDayChart"></canvas>
+    </div>
+
+    <div>
+        <h3>Commit Activity (Commits per Hour)</h3>
+        <canvas id="commitsHourChart"></canvas>
+    </div>
+
+    
+</body>
+
+</html>
