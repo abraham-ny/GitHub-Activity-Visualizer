@@ -27,7 +27,147 @@
         <canvas id="commitsHourChart"></canvas>
     </div>
 
-    
+    <script>
+        async function fetchGitHubData() {
+            const username = document.getElementById("username").value.trim();
+            if (!username) {
+                alert("Please enter a valid GitHub username.");
+                return;
+            }
+
+            const apiBaseUrl = `https://api.github.com/users/${username}/repos?per_page=100`;
+
+            try {
+                const reposResponse = await fetch(apiBaseUrl);
+                const reposData = await reposResponse.json();
+
+                if (reposData.message) {
+                    alert("User not found or API rate limit exceeded.");
+                    return;
+                }
+
+                const allCommits = await fetchCommitsForUser(reposData);
+                const languages = await fetchLanguagesForUser(reposData);
+
+                // Process commit data
+                const commitDates = processCommitData(allCommits);
+                const commitHours = processCommitHours(allCommits);
+
+                // Process most active repo
+                const mostActiveRepo = getMostActiveRepo(reposData);
+
+                // Display graphs
+                drawCommitsGraph(commitDates, "commitsDayChart", "Commits per Day");
+                drawCommitsGraph(commitHours, "commitsHourChart", "Commits per Hour");
+
+                // Display repo info
+                document.getElementById('repo-info').innerHTML = `
+            <h2>Most Active Repo: ${mostActiveRepo.name}</h2>
+            <p>Top Language: ${languages.topLanguage}</p>
+        `;
+            } catch (error) {
+                console.error('Error fetching GitHub data:', error);
+            }
+        }
+
+        async function fetchCommitsForUser(repos) {
+            const allCommits = [];
+
+            for (const repo of repos) {
+                const commitsResponse = await fetch(repo.commits_url.replace("{/sha}", "") + "?per_page=100");
+                const commits = await commitsResponse.json();
+                allCommits.push(...commits);
+            }
+
+            return allCommits;
+        }
+
+        async function fetchLanguagesForUser(repos) {
+            const languages = {};
+
+            for (const repo of repos) {
+                const languagesResponse = await fetch(repo.languages_url);
+                const repoLanguages = await languagesResponse.json();
+
+                for (const [language, value] of Object.entries(repoLanguages)) {
+                    if (languages[language]) {
+                        languages[language] += value;
+                    } else {
+                        languages[language] = value;
+                    }
+                }
+            }
+
+            const topLanguage = Object.keys(languages).reduce((a, b) => languages[a] > languages[b] ? a : b);
+            return { topLanguage };
+        }
+
+        function processCommitData(commits) {
+            const commitDates = {};
+
+            commits.forEach(commit => {
+                const date = new Date(commit.commit.author.date);
+                const dateString = date.toISOString().split('T')[0]; // Get only the date (yyyy-mm-dd)
+
+                commitDates[dateString] = (commitDates[dateString] || 0) + 1;
+            });
+
+            return Object.entries(commitDates).map(([date, count]) => ({ x: date, y: count }));
+        }
+
+        function processCommitHours(commits) {
+            const commitHours = {};
+
+            commits.forEach(commit => {
+                const date = new Date(commit.commit.author.date);
+                const hour = date.getHours();
+
+                commitHours[hour] = (commitHours[hour] || 0) + 1;
+            });
+
+            return Array.from({ length: 24 }, (_, i) => ({ x: i, y: commitHours[i] || 0 }));
+        }
+
+        function getMostActiveRepo(repos) {
+            return repos.reduce((maxRepo, repo) => {
+                return repo.stargazers_count > (maxRepo.stargazers_count || 0) ? repo : maxRepo;
+            });
+        }
+
+        function drawCommitsGraph(data, chartId, label) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        borderColor: 'rgb(75, 192, 192)',
+                        fill: false,
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Number of Commits'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>
