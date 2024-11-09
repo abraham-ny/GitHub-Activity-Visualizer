@@ -162,6 +162,7 @@
             const username = document.getElementById("username").value.trim();
             if (!username) {
                 alert("Please enter a valid GitHub username.");
+                username = prompt("Enter github username");
                 return;
             }
 
