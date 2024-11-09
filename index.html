@@ -6,7 +6,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GitHub User Activity</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-   
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 250px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+
+        #repo-info {
+            margin-top: 30px;
+        }
+
+        /* General Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #121212;
+            /* GitHub Dark Mode background */
+            color: #e1e4e8;
+            /* Light gray text, similar to GitHub Dark Mode */
+            margin: 0;
+            padding: 20px;
+        }
+
+        input[type="text"] {
+            background-color: #1c1e22;
+            /* Dark input field */
+            color: #e1e4e8;
+            /* Light text for input */
+            border: 1px solid #444c56;
+            /* Dark border */
+            padding: 10px;
+            width: 250px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2f74c0;
+            /* Light blue outline on focus */
+        }
+
+        button {
+            background-color: #2f74c0;
+            /* GitHub blue */
+            color: #fff;
+            /* White text on blue background */
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #0366d6;
+            /* Darker blue when hovering */
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        h1,
+        h2 {
+            color: #fff;
+            /* White text for headings */
+        }
+
+        h3 {
+            color: #e1e4e8;
+            /* Light gray color for subheadings */
+        }
+
+        #repo-info {
+            background-color: #1c1e22;
+            /* Dark background for repo info */
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        #repo-info h2 {
+            margin: 0;
+            color: #2f74c0;
+            /* Highlight repo name in GitHub blue */
+        }
+
+        #repo-info p {
+            color: #e1e4e8;
+            /* Light gray text for repo info */
+        }
+
+        /* Graph Container */
+        canvas {
+            margin-top: 20px;
+            border-radius: 8px;
+            background-color: #1c1e22;
+            /* Dark background for graphs */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Chart.js Custom Styles */
+        .chartjs-size-monitor,
+        .chartjs-size-monitor-expand,
+        .chartjs-size-monitor-shrink {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            border-radius: 4px;
+        }
+    </style>
 </head>
 
 <body>
